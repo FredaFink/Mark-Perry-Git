@@ -49,60 +49,48 @@ public class LibraryMenu
     * Main entry point. Display and process the menu.
     **************************************************************************/
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         final String c_sErrExit = "Sorry, the program cannot run and must exit.";
 
         // First load our data.
-        if (!loadBooks())
-        {
+        if (!loadBooks()) {
             System.out.println("ERROR: file " + sBooksFile + " was not found!");
             System.out.println(c_sErrExit);
             return;
         }
-        if (!loadUsers())
-        {
+        if (!loadUsers()) {
             System.out.println("ERROR: file " + sUsersFile + " was not found!");
             System.out.println(c_sErrExit);
             return;
         }
-        while (true)
-        {
-            switch(displayMainMenu())
-            {
-                case '1':
-                    newMember();
-                    break;
-                case '2':
-                    bookBorrow();
-                    break;
-                case '3':
-                    bookSearch();
-                    break;
-                case '4':
-                    bookReturn();
-                    break;
-                case '5':
-                    payFee();
-                    break;
-                default:        // exit selected
-                    if (bDebug) System.out.println(">>>>Debug: exiting");
-                    sc.close();
-                    return;
-            }
+        
+        char cReturn;
+        do {
+            cReturn = displayMainMenu();
+            switch(cReturn) {
+                case '1' -> newMember();
+                case '2' -> bookBorrow();
+                case '3' -> bookSearch();
+                case '4' -> bookReturn();
+                case '5' -> payFee();
+              }
         }
+        while (cReturn != '0');
+        
+        if (bDebug) System.out.println(">>>>Debug: exiting");
+        sc.close();
     }
 
     /*************************************************************************
-    * Function to display the menu
-    **************************************************************************/
+    * Function to display the menu.
+    * It relies on the sequence of the character values from '0' to '5'
+    * being sequentially ascending in order.
+    *****************************************/
 
-    private static char displayMainMenu()
-    {
+    private static char displayMainMenu() {
         String sInput = "";
 
-        while (true)
-        {
+        do {
             clearScreen();
             System.out.println("Welcome to the Library system.\n" +
                        "Here you can select one the following functions:\n"+
@@ -118,15 +106,15 @@ public class LibraryMenu
             if (sInput.isEmpty()       ||
                 sInput.length() > 1    ||
                 sInput.charAt(0) > '5' ||
-                sInput.charAt(0) < '0')
-            {
-                 System.out.println("\nI'm afraid your input is invalid.\n" +
+                sInput.charAt(0) < '0') {
+                    System.out.println("\nI'm afraid your input is invalid.\n" +
                          "Press ENTER to re-enter your choice.\n");
-                 sInput = sc.nextLine();
-                 continue;
             }
-            break;
-        }
+        } while(sInput.isEmpty()        ||
+                (!sInput.isEmpty()      &&
+                 sInput.charAt(0) > '5' &&
+                 sInput.charAt(0) < '0'));
+        
         return sInput.charAt(0);
     }
 
@@ -134,8 +122,7 @@ public class LibraryMenu
      * Function/method to add a new member.
     **************************************************************************/
 
-    private static void newMember()
-    {
+    private static void newMember() {
         final String c_sPressEnter = "\nOtherwise just press ENTER.";
         final String c_sRetry = "\nPlease retry.";
         final String c_sMandatory = " This is a required entry";
@@ -155,8 +142,7 @@ public class LibraryMenu
 
         if (bDebug) System.out.println(">>>>Debug: newMember() entry");
 
-         while (true)
-        {
+        do {
             clearScreen();
             System.out.println("To become a member of the library.\n" +
                             "We need some of your details.\n");
@@ -165,17 +151,14 @@ public class LibraryMenu
             // For ease of re-entry we display and allow any
             // previous entry to be used.
             System.out.println("Enter your First Name." + c_sMandatory);
-            if (!sFirstName.isEmpty())
-            {
+            if (!sFirstName.isEmpty()) {
                 System.out.println("Default: " + "\"" + sFirstName+ "\"");
                 System.out.println(c_sAccept);
             }
             System.out.print(": ");
             sInput = sc.nextLine();
-            if (sFirstName.isEmpty())
-            {
-                if (sInput.isEmpty() || sInput.contains(" "))
-                {
+            if (sFirstName.isEmpty()) {
+                if (sInput.isEmpty() || sInput.contains(" ")) {
                     System.out.println("Your first name appears to be invalid."
                                        + c_sRetry);
                     continue;
@@ -185,32 +168,27 @@ public class LibraryMenu
             // Get an optional Middle name or initial.
             System.out.println("Enter your Middle Name or initial " +
                                "if you have one" + c_sPressEnter);
-            if (!sMiddleName.isEmpty())
-            {
+            if (!sMiddleName.isEmpty()) {
                 System.out.println("Default: " + "\"" + sMiddleName + "\"");
                 System.out.println(c_sAccept);
             }
             System.out.print(": ");
             sInput = sc.nextLine();
-            if (!sInput.isEmpty())
-            {
+            if (!sInput.isEmpty()) {
                 sMiddleName = sInput;
             }
 
             // Get a mandatory Surname.
             System.out.println("Enter your Last Name/Surname." +
                                 c_sMandatory + ":");
-            if (!sLastName.isEmpty())
-            {
+            if (!sLastName.isEmpty()) {
                 System.out.println("Default: " + sLastName);
                 System.out.println(c_sAccept);
             }
             System.out.print(": ");
             sInput = sc.nextLine();
-            if (sLastName.isEmpty())
-            {
-                if (sInput.isEmpty() || sInput.contains(" "))
-                {
+            if (sLastName.isEmpty()) {
+                if (sInput.isEmpty() || sInput.contains(" ")) {
                     System.out.println("Your last name appears to be invalid." +
                                        c_sRetry);
                     continue;
@@ -225,15 +203,13 @@ public class LibraryMenu
             System.out.println("Enter your full postal or residential address" +
                                " on a single line separated by commas:\n" +
                                c_sMandatory);
-            if (!sAddress.isEmpty())
-            {
+            if (!sAddress.isEmpty()) {
                 System.out.println("Default: " + sAddress);
                 System.out.println(c_sAccept);
             }
             System.out.print(": ");
             sInput = sc.nextLine();
-            if (sInput.isEmpty() || !sInput.contains(","))
-            {
+            if (sInput.isEmpty() || !sInput.contains(",")) {
                 System.out.println("You must provide a valid address." +
                                    c_sRetry);
                 continue;
@@ -242,15 +218,13 @@ public class LibraryMenu
             // Get an optional mobile number.
             System.out.println("Enter your mobile number if you have one." +
                                 c_sPressEnter + sMobile);
-            if (!sMobile.isEmpty())
-            {
+            if (!sMobile.isEmpty()) {
                 System.out.println("Default: " + sMobile);
                 System.out.println(c_sAccept);
             }
             System.out.print(": ");
             sInput = sc.nextLine();
-            if (!checkPhone(sInput))
-            {
+            if (!checkPhone(sInput)) {
                 System.out.println("The mobile number you entered is invalid." +
                                    c_sRetry);
                 continue;
@@ -260,8 +234,7 @@ public class LibraryMenu
             // Get an optional landline number.
             System.out.println("Enter your telephone landline number if " +
                                "you have one." + c_sPressEnter + sLandLine);
-            if (!sLandLine.isEmpty())
-            {
+            if (!sLandLine.isEmpty()) {
                 System.out.println("Default: " + sLandLine);
                 System.out.println(c_sAccept);
             }
@@ -274,8 +247,7 @@ public class LibraryMenu
             System.out.println("Enter your email address if you have one." +
                                 c_sPressEnter + sEmail);
             sInput = sc.nextLine();
-            if (sInput.isEmpty() || !checkEmail(sInput))
-            {
+            if (sInput.isEmpty() || !checkEmail(sInput)) {
                 System.out.println("The email address you entered is invalid." +
                                    c_sRetry);
                 continue;
@@ -283,8 +255,7 @@ public class LibraryMenu
             sEmail = sInput;
 
             System.out.println("\nThank you.\n");
-            if (sMobile.isEmpty() && sLandLine.isEmpty() && sEmail.isEmpty())
-            {
+            if (sMobile.isEmpty() && sLandLine.isEmpty() && sEmail.isEmpty()) {
                 System.out.println("Unfortunately you must provide at least " +
                                    "one of: mobile or landline or email." +
                                    "\n You have not done so." + c_sRetry);
@@ -294,46 +265,37 @@ public class LibraryMenu
                                "please confirm the following:");
             System.out.println("Your name is: " + sFullName);
             System.out.println("Your address is: " + sAddress);
-            if  (!sMobile.isEmpty())
-            {
+            if  (!sMobile.isEmpty()) {
                  System.out.println("Your mobile number is: " + sMobile);
             }
-            if  (!sLandLine.isEmpty())
-            {
+            if  (!sLandLine.isEmpty()) {
                  System.out.println("Your land line number is: " + sLandLine);
             }
-            if  (!sEmail.isEmpty())
-            {
+            if  (!sEmail.isEmpty()) {
                  System.out.println("Your email is: " + sEmail);
             }
 
             System.out.println("Is this correct? Enter Y(es) or N(o)");
             sInput = sc.nextLine();
-            if (!sInput.isEmpty())
-            {
-                sInput = sInput.toUpperCase();
-                // Assume anything other than Y(es) is a N(o).
-                if (sInput.substring(0,1) == "Y")
-                {
-                    // We now have user data so can create a user object
-                    // to store preferably in a database.
-                    // We need to create an object of Class user with
-                    // these details plus generate an appropriate number to
-                    // ensure uniqueness.
-                    // NB: Forget providing a library card.
-
-                    break;
-                }
-             }
-        }
-    }
+            
+            if (!sInput.isEmpty()) sInput = sInput.toUpperCase();
+            
+          // Assume anything other than Y(es) is a N(o).
+        } while (!sInput.isEmpty() && !sInput.substring(0,1).equals("Y"));
+                
+        // We now have user data so can create a user object
+        // to store preferably in a database.
+        // We need to create an object of Class User with
+        // these details plus generate an appropriate number to
+        // ensure uniqueness.
+        // NB: Forget providing a library card!!!
+}
 
     /*************************************************************************
      * Function/method to load books from a file.
      **************************************************************************/
 
-    private static boolean loadBooks()
-    {
+    private static boolean loadBooks() {
         if (bDebug) System.out.println(">>>>Debug: loadBooks()");
         return true;
     }
@@ -342,8 +304,7 @@ public class LibraryMenu
      * Function/method to load users from a file.
      **************************************************************************/
 
-    private static boolean loadUsers()
-    {
+    private static boolean loadUsers() {
         if (bDebug) System.out.println(">>>>Debug: loadUsers()");
         return true;
     }
@@ -352,8 +313,7 @@ public class LibraryMenu
      * Function/method to borrow a book.
      **************************************************************************/
 
-    private static void bookBorrow()
-    {
+    private static void bookBorrow() {
         if (bDebug) System.out.println(">>>>Debug: bookBorrow()");
     }
 
@@ -361,8 +321,7 @@ public class LibraryMenu
      * Function/method to search for a book.
     **************************************************************************/
 
-    private static void bookSearch()
-    {
+    private static void bookSearch() {
         if (bDebug) System.out.println(">>>>Debug: bookSearch()");
         // We need some books
     }
@@ -371,8 +330,7 @@ public class LibraryMenu
      * Function/method to return a book.
     **************************************************************************/
 
-    private static void bookReturn()
-    {
+    private static void bookReturn() {
         if (bDebug) System.out.println(">>>>Debug: bookReturn()");
     }
 
@@ -380,27 +338,22 @@ public class LibraryMenu
      * Function/method to pay a later return fee.
     **************************************************************************/
 
-   private static void payFee()
-    {
-        if (bDebug)
-            System.out.println(">>>>Debug: payFee()");
+   private static void payFee() {
+        if (bDebug) System.out.println(">>>>Debug: payFee()");
     }
 
     /*************************************************************************
      * Function/method to clear the console screen.
      **************************************************************************/
 
-    private static void clearScreen()
-    {
+    private static void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
-     /*   try
-        {
+     /*   try {
             new ProcessBuilder("cmd", "/c", "cls").
                                 inheritIO().start().waitFor();
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             if (bDebug)
                 System.out.println("Debug>>>> Exception clearing the screen.");
         } */
@@ -423,8 +376,7 @@ public class LibraryMenu
     * No consecutive dots.
      **************************************************************************/
 
-    private static boolean checkEmail(String sTest)
-    {
+    private static boolean checkEmail(String sTest) {
         final String regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\\\." +
                                 "[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+" +
                                 "(\\\\.[A-Za-z0-9-]+)*(\\\\.[A-Za-z]{2,})$";
@@ -435,8 +387,7 @@ public class LibraryMenu
      * Function/method to check phone numbers. A USA test. Is it valid?
      **************************************************************************/
 
-    private static boolean checkPhone(String sTest)
-    {
+    private static boolean checkPhone(String sTest) {
         final String regex = "^(?:(?:\\+?1\\s*(?:[.-]\\s*)?)?" +
                              "(?:\\(\\s*([2-9]1[02-9]|[2-9][02-8]" +
                              "1|[2-9][02-8][02-9])\\s*\\)|([2-9]1[02-9]" +
